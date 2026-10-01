@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml xmlns="https://developers.google.com/blockly/xml" is_dbot="true" collection="false">
+  <variables>
+    <variable id="prediction">prediction</variable>
+    <variable id="baseStake">baseStake</variable>
+    <variable id="stake">stake</variable>
+    <variable id="consecutiveLosses">consecutiveLosses</variable>
+    <variable id="lossLimit">lossLimit</variable>
+    <variable id="lastCandle">lastCandle</variable>
+    <variable id="trendStrength">trendStrength</variable>
+    <variable id="volatility">volatility</variable>
+    <variable id="candleOpen">candleOpen</variable>
+    <variable id="candleClose">candleClose</variable>
+    <variable id="candleHigh">candleHigh</variable>
+    <variable id="candleLow">candleLow</variable>
+  </variables>
+
+  <block type="trade_definition" id="trade_definition" deletable="false" x="0" y="20">
+    <statement name="TRADE_OPTIONS">
+      <block type="trade_definition_market" id="market" deletable="false" movable="false">
+        <field name="MARKET_LIST">synthetic_index</field>
+        <field name="SUBMARKET_LIST">random_index</field>
+        <field name="SYMBOL_LIST">R_10</field>
+        <next>
+          <block type="trade_definition_tradetype" id="trade_type" deletable="false" movable="false">
+            <field name="TRADETYPECAT_LIST">digits</field>
+            <field name="TRADETYPE_LIST">matchesdiffers</field>
+            <next>
+              <block type="trade_definition_contracttype" id="contract_type" deletable="false" movable="false">
+                <field name="TYPE_LIST">both</field>
+                <next>
+                  <block type="trade_definition_candleinterval" id="candle_interval" deletable="false" movable="false">
+                    <field name="CANDLEINTERVAL_LIST">60</field>
+                    <next>
+                      <block type="trade_definition_restartbuysell" id="restart_buy_sell" deletable="false" movable="false">
+                        <field name="TIME_MACHINE_ENABLED">FALSE</field>
+                        <next>
+                          <block type="trade_definition_restartonerror" id="restart_on_error" deletable="false" movable="false">
+                            <field name="RESTARTONERROR">FALSE</field>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+
+    <statement name="INITIALIZATION">
+      <block type="variables_set" id="set_prediction">
+        <field name="VAR" id="prediction">prediction</field>
+        <value name="VALUE"><block type="math_number" id="prediction_value"><field name="NUM">1</field></block></value>
+        <next>
+          <block type="variables_set" id="set_base_stake">
+            <field name="VAR" id="baseStake">baseStake</field>
+            <value name="VALUE"><block type="math_number" id="base_stake_value"><field name="NUM">3</field></block></value>
+            <next>
+              <block type="variables_set" id="set_stake">
+                <field name="VAR" id="stake">stake</field>
+                <value name="VALUE"><block type="variables_get" id="base_stake_get"><field name="VAR" id="baseStake">baseStake</field></block></value>
+                <next>
+                  <block type="variables_set" id="set_loss_limit">
+                    <field name="VAR" id="lossLimit">lossLimit</field>
+                    <value name="VALUE"><block type="math_number" id="loss_limit_value"><field name="NUM">2</field></block></value>
+                    <next>
+                      <block type="variables_set" id="set_losses_zero">
+                        <field name="VAR" id="consecutiveLosses">consecutiveLosses</field>
+                        <value name="VALUE"><block type="math_number" id="losses_zero"><field name="NUM">0</field></block></value>
+                        <next>
+                          <block type="variables_set" id="set_volatility_zero">
+                            <field name="VAR" id="volatility">volatility</field>
+                            <value name="VALUE"><block type="math_number" id="volatility_zero"><field name="NUM">0</field></block></value>
+                            <next>
+                              <block type="variables_set" id="set_trend_zero">
+                                <field name="VAR" id="trendStrength">trendStrength</field>
+                                <value name="VALUE"><block type="math_number" id="trend_zero"><field name="NUM">0</field></block></value>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+
+    <statement name="SUBMARKET">
+      <block type="trade_definition_tradeoptions" id="trade_options">
+        <mutation xmlns="http://www.w3.org/1999/xhtml" has_first_barrier="false" has_second_barrier="false" has_prediction="true"></mutation>
+        <field name="DURATIONTYPE_LIST">t</field>
+        <value name="DURATION"><block type="math_number" id="duration"><field name="NUM">1</field></block></value>
+        <value name="AMOUNT"><block type="variables_get" id="stake_get"><field name="VAR" id="stake">stake</field></block></value>
+        <value name="PREDICTION"><block type="variables_get" id="prediction_get"><field name="VAR" id="prediction">prediction</field></block></value>
+      </block>
+    </statement>
+  </block>
+
+  <block type="before_purchase" id="before_purchase" deletable="false" x="0" y="900">
+    <statement name="BEFOREPURCHASE_STACK">
+      <!-- MARKET ANALYSIS: Analyze last candle for trend and volatility -->
+      <block type="variables_set" id="analyze_last_candle">
+        <field name="VAR" id="lastCandle">lastCandle</field>
+        <value name="VALUE"><block type="candle" id="get_last_candle"><field name="FIELD_NAME">close</field></block></value>
+        <next>
+          <block type="variables_set" id="get_candle_open">
+            <field name="VAR" id="candleOpen">candleOpen</field>
+            <value name="VALUE"><block type="candle" id="get_candle_open_val"><field name="FIELD_NAME">open</field></block></value>
+            <next>
+              <block type="variables_set" id="get_candle_high">
+                <field name="VAR" id="candleHigh">candleHigh</field>
+                <value name="VALUE"><block type="candle" id="get_candle_high_val"><field name="FIELD_NAME">high</field></block></value>
+                <next>
+                  <block type="variables_set" id="get_candle_low">
+                    <field name="VAR" id="candleLow">candleLow</field>
+                    <value name="VALUE"><block type="candle" id="get_candle_low_val"><field name="FIELD_NAME">low</field></block></value>
+                    <next>
+                      <!-- Calculate Volatility (High - Low) -->
+                      <block type="variables_set" id="calc_volatility">
+                        <field name="VAR" id="volatility">volatility</field>
+                        <value name="VALUE">
+                          <block type="math_arithmetic" id="volatility_calc">
+                            <field name="OP">MINUS</field>
+                            <value name="A"><block type="variables_get" id="high_get"><field name="VAR" id="candleHigh">candleHigh</field></block></value>
+                            <value name="B"><block type="variables_get" id="low_get"><field name="VAR" id="candleLow">candleLow</field></block></value>
+                          </block>
+                        </value>
+                        <next>
+                          <!-- Check if Trend is Strong (Close > Open = Bullish, Close < Open = Bearish) -->
+                          <block type="variables_set" id="calc_trend">
+                            <field name="VAR" id="trendStrength">trendStrength</field>
+                            <value name="VALUE">
+                              <block type="math_arithmetic" id="trend_calc">
+                                <field name="OP">MINUS</field>
+                                <value name="A"><block type="variables_get" id="close_get"><field name="VAR" id="lastCandle">lastCandle</field></block></value>
+                                <value name="B"><block type="variables_get" id="open_get"><field name="VAR" id="candleOpen">candleOpen</field></block></value>
+                              </block>
+                            </value>
+                            <next>
+                              <!-- FILTER 1: Check Volatility (Skip if too high) -->
+                              <block type="controls_if" id="volatility_check">
+                                <value name="IF0">
+                                  <block type="logic_compare" id="volatility_too_high">
+                                    <field name="OP">GT</field>
+                                    <value name="A"><block type="variables_get" id="vol_check"><field name="VAR" id="volatility">volatility</field></block></value>
+                                    <value name="B"><block type="math_number" id="vol_threshold"><field name="NUM">0.5</field></block></value>
+                                  </block>
+                                </value>
+                                <statement name="DO0">
+                                  <block type="notify" id="skip_high_vol">
+                                    <field name="COLOR">blue</field>
+                                    <field name="SOUND">Silent</field>
+                                    <field name="MSG">Volatility too high. Skipping this trade.</field>
+                                  </block>
+                                </statement>
+                                <statement name="ELSE">
+                                  <!-- FILTER 2: Check Trend Strength (Close must differ from Open) -->
+                                  <block type="controls_if" id="trend_strength_check">
+                                    <mutation xmlns="http://www.w3.org/1999/xhtml" else="1"></mutation>
+                                    <value name="IF0">
+                                      <block type="logic_compare" id="trend_is_weak">
+                                        <field name="OP">EQ</field>
+                                        <value name="A"><block type="variables_get" id="trend_val"><field name="VAR" id="trendStrength">trendStrength</field></block></value>
+                                        <value name="B"><block type="math_number" id="zero_trend"><field name="NUM">0</field></block></value>
+                                      </block>
+                                    </value>
+                                    <statement name="DO0">
+                                      <block type="notify" id="skip_noisy">
+                                        <field name="COLOR">blue</field>
+                                        <field name="SOUND">Silent</field>
+                                        <field name="MSG">Noisy market (weak candle). Skipping this trade.</field>
+                                      </block>
+                                    </statement>
+                                    <statement name="ELSE">
+                                      <!-- FILTER 3: Set Prediction based on Candle Direction (Strong Trend) -->
+                                      <block type="controls_if" id="candle_direction_check">
+                                        <value name="IF0">
+                                          <block type="logic_compare" id="candle_bullish">
+                                            <field name="OP">GT</field>
+                                            <value name="A"><block type="variables_get" id="close_bullish"><field name="VAR" id="lastCandle">lastCandle</field></block></value>
+                                            <value name="B"><block type="variables_get" id="open_bullish"><field name="VAR" id="candleOpen">candleOpen</field></block></value>
+                                          </block>
+                                        </value>
+                                        <statement name="DO0">
+                                          <!-- Bullish Candle: Predict UP -->
+                                          <block type="variables_set" id="prediction_bullish">
+                                            <field name="VAR" id="prediction">prediction</field>
+                                            <value name="VALUE"><block type="math_number" id="predict_up"><field name="NUM">1</field></block></value>
+                                            <next>
+                                              <block type="purchase" id="purchase_bullish">
+                                                <field name="PURCHASE_LIST">DIGITDIFFERS</field>
+                                              </block>
+                                            </next>
+                                          </block>
+                                        </statement>
+                                        <statement name="ELSE">
+                                          <!-- Bearish Candle: Predict DOWN -->
+                                          <block type="variables_set" id="prediction_bearish">
+                                            <field name="VAR" id="prediction">prediction</field>
+                                            <value name="VALUE"><block type="math_number" id="predict_down"><field name="NUM">0</field></block></value>
+                                            <next>
+                                              <block type="purchase" id="purchase_bearish">
+                                                <field name="PURCHASE_LIST">DIGITDIFFERS</field>
+                                              </block>
+                                            </next>
+                                          </block>
+                                        </statement>
+                                      </block>
+                                    </statement>
+                                  </block>
+                                </statement>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+
+  <block type="after_purchase" id="after_purchase" x="700" y="20">
+    <statement name="AFTERPURCHASE_STACK">
+      <block type="controls_if" id="result_check">
+        <mutation xmlns="http://www.w3.org/1999/xhtml" else="1"></mutation>
+        <value name="IF0"><block type="contract_check_result" id="win_check"><field name="CHECK_RESULT">win</field></block></value>
+        <statement name="DO0">
+          <!-- WIN: Reset stake and loss counter -->
+          <block type="variables_set" id="reset_stake">
+            <field name="VAR" id="stake">stake</field>
+            <value name="VALUE"><block type="variables_get" id="reset_stake_get"><field name="VAR" id="baseStake">baseStake</field></block></value>
+            <next>
+              <block type="variables_set" id="reset_loss_count">
+                <field name="VAR" id="consecutiveLosses">consecutiveLosses</field>
+                <value name="VALUE"><block type="math_number" id="reset_loss_value"><field name="NUM">0</field></block></value>
+                <next>
+                  <block type="notify" id="win_notify">
+                    <field name="COLOR">blue</field>
+                    <field name="SOUND">Silent</field>
+                    <field name="MSG">Win! Stake reset. Continuing analysis...</field>
+                    <next><block type="trade_again" id="trade_after_win"></block></next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <statement name="ELSE">
+          <!-- LOSS: Increment loss counter, reset stake, check limit -->
+          <block type="variables_set" id="increment_losses">
+            <field name="VAR" id="consecutiveLosses">consecutiveLosses</field>
+            <value name="VALUE">
+              <block type="math_arithmetic" id="loss_count_add">
+                <field name="OP">ADD</field>
+                <value name="A"><block type="variables_get" id="loss_count_get"><field name="VAR" id="consecutiveLosses">consecutiveLosses</field></block></value>
+                <value name="B"><block type="math_number" id="one"><field name="NUM">1</field></block></value>
+              </block>
+            </value>
+            <next>
+              <block type="variables_set" id="reset_stake_after_loss">
+                <field name="VAR" id="stake">stake</field>
+                <value name="VALUE"><block type="variables_get" id="base_after_loss"><field name="VAR" id="baseStake">baseStake</field></block></value>
+                <next>
+                  <block type="controls_if" id="loss_limit_check">
+                    <value name="IF0">
+                      <block type="logic_compare" id="losses_below_limit">
+                        <field name="OP">LT</field>
+                        <value name="A"><block type="variables_get" id="losses_value"><field name="VAR" id="consecutiveLosses">consecutiveLosses</field></block></value>
+                        <value name="B"><block type="variables_get" id="loss_limit_get"><field name="VAR" id="lossLimit">lossLimit</field></block></value>
+                      </block>
+                    </value>
+                    <statement name="DO0">
+                      <block type="notify" id="loss_continue">
+                        <field name="COLOR">blue</field>
+                        <field name="SOUND">Silent</field>
+                        <field name="MSG">Loss recorded. Stake reset. Analyzing fresh conditions...</field>
+                        <next><block type="trade_again" id="trade_after_single_loss"></block></next>
+                      </block>
+                    </statement>
+                    <statement name="ELSE">
+                      <block type="notify" id="loss_limit_reached">
+                        <field name="COLOR">red</field>
+                        <field name="SOUND">Silent</field>
+                        <field name="MSG">Two consecutive losses. Trading paused for safety. Fresh analysis needed.</field>
+                      </block>
+                    </statement>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>
